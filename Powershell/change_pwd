@@ -1,0 +1,26 @@
+import-module ActiveDirectory 
+$username = $args[0]
+ $password = $args[1]
+
+ # Get current domain using logged-on user's credentials
+ $CurrentDomain = "LDAP://" + ([ADSI]"").distinguishedName
+ $domain = New-Object System.DirectoryServices.DirectoryEntry($CurrentDomain,$UserName.Trim(),$Password.Trim())
+
+if ($domain.name -eq $null)
+{
+   
+    write-host "Authentication failed - please verify your username and password."
+    
+    exit #terminate the script.
+}
+else
+{
+	
+    $newpass=$args[2]
+    $NewPwd = ConvertTo-SecureString  $newpass -AsPlainText -Force
+    #write-host "Successfully authenticated"
+    Set-ADAccountPassword -Identity $args[0] -NewPassword $NewPwd	-Reset
+	$normalText = ConvertFrom-SecureString $NewPwd -AsPlainText -Force
+
+    write-host "Password has successfully changed"   $normalText 
+}
